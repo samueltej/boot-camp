@@ -9,14 +9,10 @@ import (
 )
 func main()  {
 
-	
-
     min, max, values := getInput()
-
 	resultado := minMax(min, max, values)
-	
-	//salida de datos 
 
+	//salida de datos 
 	fmt.Println("valor minimo", min, "valor maximo", max, "valores", values)
 	fmt.Println("EL rango es", resultado)
 }
@@ -44,7 +40,6 @@ func getInput()(float64, float64, []float64){
 			values = append(values, num)	
 		}
 	}
-    
 	return min, max, values
 }
 
