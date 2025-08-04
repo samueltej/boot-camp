@@ -13,8 +13,7 @@ func main()  {
 	resultado := minMax(min, max, values)
 
 	//salida de datos 
-	fmt.Println("valor minimo", min, "valor maximo", max, "valores", values)
-	fmt.Println("EL rango es", resultado)
+	fmt.Println("EL rango es -->", resultado)
 }
 
 func getInput()(float64, float64, []float64){
@@ -23,9 +22,8 @@ func getInput()(float64, float64, []float64){
 	var values [] float64
 
 	//entrada de min & max
-	fmt.Println("Escribir los valores (minimo, maximo, lista de valores), separado por espacios")
-	fmt.Scan(&min)
-	fmt.Scan(&max)
+	fmt.Println("Escribir los valores (mínimo, máximo, lista de valores), separado por espacios")
+	fmt.Scan(&min, &max)
 
 	//entrada de values
 	scanner := bufio.NewScanner(os.Stdin)
@@ -36,7 +34,7 @@ func getInput()(float64, float64, []float64){
 
 	for _, str := range partes{
 		num, err := strconv.ParseFloat(str, 64)
-		if err == nil {
+		if err != nil {
 			values = append(values, num)	
 		}
 	}
@@ -47,7 +45,7 @@ func minMax (min float64, max float64, values[] float64) [] float64{
 	var slide[] float64
 	for _, s := range values{
 
-		if s >= min && s < max{
+		if s >= min && s <= max{
 			slide = append(slide, s)
 		}
 	}	
