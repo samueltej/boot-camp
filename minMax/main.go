@@ -35,8 +35,9 @@ func getInput()(float64, float64, []float64){
 	for _, str := range partes{
 		num, err := strconv.ParseFloat(str, 64)
 		if err != nil {
-			values = append(values, num)	
-		}
+			fmt.Println("error de conversion")
+		} 
+	  	values = append(values, num)
 	}
 	return min, max, values
 }
