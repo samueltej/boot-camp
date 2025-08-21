@@ -1,25 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
+	"os"
 	"strconv"
 	"strings"
-	"os"
 )
-func main()  {
 
-    min, max, values := getInput()
+func main() {
+	min, max, values := getInput()
 	resultado := minMax(min, max, values)
 
-	//salida de datos 
+	//salida de datos
 	fmt.Println("EL rango es -->", resultado)
 }
 
-func getInput()(float64, float64, []float64){
+func getInput() (float64, float64, []float64) {
 	//declaracion de variables
 	var min, max float64
-	var values [] float64
+	var values []float64
 
 	//entrada de min & max
 	fmt.Println("Escribir los valores (mínimo, máximo, lista de valores), separado por espacios")
@@ -32,23 +32,23 @@ func getInput()(float64, float64, []float64){
 
 	partes := strings.Fields(linea)
 
-	for _, str := range partes{
+	for _, str := range partes {
 		num, err := strconv.ParseFloat(str, 64)
 		if err != nil {
 			fmt.Println("error de conversion")
-		} 
-	  	values = append(values, num)
+		}
+		values = append(values, num)
 	}
 	return min, max, values
 }
 
-func minMax (min float64, max float64, values[] float64) [] float64{
-	var slide[] float64
-	for _, s := range values{
+func minMax(min float64, max float64, values []float64) []float64 {
+	var slide []float64
+	for _, s := range values {
 
-		if s >= min && s <= max{
+		if s >= min && s <= max {
 			slide = append(slide, s)
 		}
-	}	
+	}
 	return slide
 }
