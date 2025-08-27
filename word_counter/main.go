@@ -10,46 +10,42 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	var saltos string
+	var lineCountMode string
 	if len(os.Args) > 1 {
-		saltos = os.Args[1]
+		lineCountMode = os.Args[1]
 	} else {
-		saltos = ""
+		lineCountMode = ""
 	}
-	if saltos == "-l" {
+	if lineCountMode == "-l" {
 		fmt.Println("Modo conteo de líneas. Escribe tu texto (una o varias líneas). Escribe 'exit' para terminar:")
 	} else {
 		fmt.Println("Modo conteo de palabras. Escribe tu texto (una o varias líneas). Escribe 'exit' para terminar:")
 	}
 
-	contadorPalabras := 0
-	contadorSaltos := 0
-	salida := false
+	wordCount := 0
+	lineCount := 0
+	isFinished := false
 
-	for !salida {
-		texto, _ := reader.ReadString('\n')
-		frase := strings.TrimSpace(texto)
+	for !isFinished {
+		text, _ := reader.ReadString('\n')
+		sentence := strings.TrimSpace(text)
 
-		if frase == "exit" {
-			salida = true
+		if sentence == "exit" {
+			isFinished = true
 			continue
 		}
 
-		if saltos == "-l" {
-			contadorSaltos++
+		if lineCountMode == "-l" {
+			lineCount++
 		} else {
-			words := strings.Fields(texto)
-			for _, word := range words {
-				if word != "exit" {
-					contadorPalabras++
-				}
-			}
+			words := strings.Fields(text)
+			wordCount += len(words) 
 		}
 	}
 
-	if saltos == "-l" {
-		fmt.Println("Número de líneas:", contadorSaltos)
+	if lineCountMode == "-l" {
+		fmt.Println("Número de líneas:", lineCount)
 	} else {
-		fmt.Println("Número de palabras:", contadorPalabras)
+		fmt.Println("Número de palabras:", wordCount)
 	}
 }
