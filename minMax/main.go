@@ -3,17 +3,22 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 )
 
 func main() {
+
 	min, max, values := getInput()
-	resultado := minMax(min, max, values)
+	resultado, err := minMax(min, max, values)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//salida de datos
-	fmt.Println("EL rango es -->", resultado)
+	fmt.Println("El rango es -->", resultado)
 }
 
 func getInput() (float64, float64, []float64) {
@@ -42,7 +47,12 @@ func getInput() (float64, float64, []float64) {
 	return min, max, values
 }
 
-func minMax(min float64, max float64, values []float64) []float64 {
+func minMax(min float64, max float64, values []float64) ([]float64, error) {
+
+	if min > max {
+		return nil, fmt.Errorf("limites incorrectos")
+	}
+
 	var slide []float64
 	for _, s := range values {
 
@@ -50,5 +60,9 @@ func minMax(min float64, max float64, values []float64) []float64 {
 			slide = append(slide, s)
 		}
 	}
-	return slide
+
+	if len(slide) == 0 {
+		return nil, fmt.Errorf("slide vacio")
+	}
+	return slide, nil
 }
