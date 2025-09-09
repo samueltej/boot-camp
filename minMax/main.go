@@ -10,59 +10,57 @@ import (
 )
 
 func main() {
-
 	min, max, values := getInput()
-	resultado, err := minMax(min, max, values)
+	output, err := rangeFilter(min, max, values)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//salida de datos
-	fmt.Println("El rango es -->", resultado)
+	// Output
+	fmt.Println("Values in range -->", output)
 }
 
 func getInput() (float64, float64, []float64) {
-	//declaracion de variables
+	// Variable declaration
 	var min, max float64
 	var values []float64
 
-	//entrada de min & max
-	fmt.Println("Escribir los valores (mínimo, máximo, lista de valores), separado por espacios")
+	// Input for min & max
+	fmt.Println("Enter the values (minimum, maximum, list of values), separated by spaces:")
 	fmt.Scan(&min, &max)
 
-	//entrada de values
+	// Input for values
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
-	linea := scanner.Text()
+	line := scanner.Text()
 
-	partes := strings.Fields(linea)
+	parts := strings.Fields(line)
 
-	for _, str := range partes {
+	for _, str := range parts {
 		num, err := strconv.ParseFloat(str, 64)
 		if err != nil {
-			fmt.Println("error de conversion")
+			fmt.Println("Conversion error")
+			continue
 		}
 		values = append(values, num)
 	}
 	return min, max, values
 }
 
-func minMax(min float64, max float64, values []float64) ([]float64, error) {
-
+func rangeFilter(min float64, max float64, values []float64) ([]float64, error) {
 	if min > max {
-		return nil, fmt.Errorf("limites incorrectos")
+		return nil, fmt.Errorf("invalid limits")
 	}
 
-	var slide []float64
-	for _, s := range values {
-
-		if s >= min && s <= max {
-			slide = append(slide, s)
+	var result []float64
+	for _, v := range values {
+		if v >= min && v <= max {
+			result = append(result, v)
 		}
 	}
 
-	if len(slide) == 0 {
-		return nil, fmt.Errorf("slide vacio")
+	if len(result) == 0 {
+		return nil, fmt.Errorf("no values found in range")
 	}
-	return slide, nil
+	return result, nil
 }
