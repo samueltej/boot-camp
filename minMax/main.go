@@ -58,9 +58,5 @@ func rangeFilter(min float64, max float64, values []float64) ([]float64, error) 
 			result = append(result, v)
 		}
 	}
-
-	if len(result) == 0 {
-		return nil, fmt.Errorf("no values found in range")
-	}
 	return result, nil
 }
