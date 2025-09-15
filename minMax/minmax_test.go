@@ -12,8 +12,12 @@ func TestAllValues(t *testing.T) {
 	want := []float64{30, 40, 50, 60}
 	got, err := rangeFilter(min, max, values)
 
-	if !reflect.DeepEqual(got, want) && err != nil {
-		t.Errorf("TestAllValues failed: values do not match (expected %v, got %v) or an unexpected error occurred: %v", want, got, err)
+	if err != nil {
+		t.Errorf("TestAllValues failed: unexpected error: %v", err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("TestAllValues failed: values do not match (expected %v, got %v)", want, got)
 	}
 }
 
@@ -24,8 +28,12 @@ func TestSingleValue(t *testing.T) {
 	want := []float64{15}
 	got, err := rangeFilter(min, max, values)
 
-	if !reflect.DeepEqual(got, want) && err != nil {
-		t.Errorf("TestSingleValue failed: values do not match (expected %v, got %v) or an unexpected error occurred: %v", want, got, err)
+	if err != nil {
+		t.Errorf("TestSingleValue failed: unexpected error: %v", err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("TestSingleValue failed: values do not match (expected %v, got %v)", want, got)
 	}
 }
 
@@ -35,22 +43,29 @@ func TestGreaterMax(t *testing.T) {
 
 	got, err := rangeFilter(min, max, values)
 
-	if got == nil && err == nil {
-		t.Errorf("TestGreaterMax failed: values were accepted as correct even though min (%v) > max (%v)", min, max)
+	if err == nil {
+		t.Errorf("TestGreaterMax failed: expected an error because min (%v) > max (%v)", min, max)
 	}
 
+	if got != nil {
+		t.Errorf("TestGreaterMax failed: expected nil values, but got %v", got)
+	}
 }
 
 func TestNoValuesInRange(t *testing.T) {
 	min, max := 10.0, 20.0
 	values := []float64{30, 40, 50}
+
 	want := []float64{}
 	got, err := rangeFilter(min, max, values)
 
-	if !reflect.DeepEqual(got, want) && err != nil {
-		t.Errorf("TestNoValuesInRange failed: values do not match (expected %v, got %v) or an unexpected error occurred: %v", want, got, err)
+	if err != nil {
+		t.Errorf("TestNoValuesInRange failed: unexpected error: %v", err)
 	}
 
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("TestNoValuesInRange failed: values do not match (expected %v, got %v)", want, got)
+	}
 }
 
 func TestNegativeLimit(t *testing.T) {
@@ -60,8 +75,12 @@ func TestNegativeLimit(t *testing.T) {
 	want := []float64{-15, -10}
 	got, err := rangeFilter(min, max, values)
 
-	if !reflect.DeepEqual(got, want) && err != nil {
-		t.Errorf("TestNegativeLimite failed: values do not match (expected %v, got %v) or an unexpected error occurred: %v", want, got, err)
+	if err != nil {
+		t.Errorf("TestNegativeLimit failed: unexpected error: %v", err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("TestNegativeLimit failed: values do not match (expected %v, got %v)", want, got)
 	}
 }
 
@@ -72,7 +91,11 @@ func TestEqualMinAndMax(t *testing.T) {
 	want := []float64{50}
 	got, err := rangeFilter(min, max, values)
 
-	if !reflect.DeepEqual(got, want) && err != nil {
-		t.Errorf("TestEqualMinAndMax failed: values do not match (expected %v, got %v) or an unexpected error occurred: %v", want, got, err)
+	if err != nil {
+		t.Errorf("TestEqualMinAndMax failed: unexpected error: %v", err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("TestEqualMinAndMax failed: values do not match (expected %v, got %v)", want, got)
 	}
 }

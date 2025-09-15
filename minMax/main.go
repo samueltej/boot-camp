@@ -52,11 +52,13 @@ func rangeFilter(min float64, max float64, values []float64) ([]float64, error) 
 		return nil, fmt.Errorf("invalid limits")
 	}
 
-	var result []float64
+	result := []float64{}
+
 	for _, v := range values {
 		if v >= min && v <= max {
 			result = append(result, v)
 		}
 	}
+
 	return result, nil
 }
