@@ -17,9 +17,9 @@ func main() {
 		lineCountMode = ""
 	}
 	if lineCountMode == "-l" {
-		fmt.Println("Modo conteo de líneas. Escribe tu texto (una o varias líneas). Escribe 'exit' para terminar:")
+		fmt.Println("Line count mode. Write your text (one or several lines). Type 'exit' to finish:")
 	} else {
-		fmt.Println("Modo conteo de palabras. Escribe tu texto (una o varias líneas). Escribe 'exit' para terminar:")
+		fmt.Println("Word count mode. Write your text (one or several lines). Type 'exit' to finish:")
 	}
 
 	contador := 0
@@ -27,27 +27,31 @@ func main() {
 
 	for !isFinished {
 
-		text, _ := reader.ReadString('\n')
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Error while reading:", err)
+			return
+		}
 		sentence := strings.TrimSpace(text)
 
-		if sentence == "Exit" || sentence == "exit" ||sentence == "EXIT" { 
-			isFinished = true 
+		if sentence == "Exit" || sentence == "exit" || sentence == "EXIT" {
+			isFinished = true
 			continue
-		 }
+		}
 
 		result := wordCounter(sentence, lineCountMode)
 		contador += result
 	}
 
 	if lineCountMode == "-l" {
-		fmt.Println("Número de líneas:", contador)
+		fmt.Println("Number of lines:", contador)
 	} else {
-		fmt.Println("Número de palabras:", contador)
+		fmt.Println("Number of words:", contador)
 	}
 }
 
 func wordCounter(word string, mode string) int {
-	
+
 	if mode == "-l" {
 		return 1
 	} else {
