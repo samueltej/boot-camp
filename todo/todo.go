@@ -1,8 +1,8 @@
 package todo
 
 import (
+	"fmt"
 	"time"
-	"errors"
 )
 
 type item struct {
@@ -14,7 +14,7 @@ type item struct {
 
 type List []item
 
-func (ls *List) AddList(task string) {
+func (ls *List) AddTask(task string) {
 	i := item{
 		Task:      task,
 		Done:      false,
@@ -24,7 +24,7 @@ func (ls *List) AddList(task string) {
 }
 func (ls *List) CompleteTask(index int) error {
 	if index < 0 || index >= len(*ls) {
-		return errors.New("index don't exists")
+		return fmt.Errorf("invalid index %d", index)
 	}
 	(*ls)[index].Done = true
 	(*ls)[index].CompletedAt = time.Now()
@@ -33,7 +33,7 @@ func (ls *List) CompleteTask(index int) error {
 
 func (ls *List) DeleteTask(index int) error {
 	if index < 0 || index >= len(*ls) {
-		return errors.New("index don't exists")
+		return fmt.Errorf("invalid index %d", index)
 	}
 
 	*ls = append((*ls)[:index], (*ls)[index+1:]...)
