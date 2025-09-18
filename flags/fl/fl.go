@@ -7,14 +7,11 @@ type Flag struct {
 	description string 
 }
 
-
 var flags = make(map[string]*Flag)
 
 func Parse() {
-
-	for i := 1; i < len(os.Args); i++ {
-		arg := os.Args[i]
-		if flagRef, exists := flags[arg]; exists {
+	for _, arg := range os.Args[1:] {
+		if flagRef, ok := flags[arg]; ok {
 			flagRef.value = true
 		}
 	}
@@ -23,10 +20,10 @@ func Parse() {
 func Bool(cmd string, value bool, description string) *bool {
 
 	f := &Flag{
-		value:       value,
-		description: description,
+		value,
+		description,
 	}
-
+	
 	flags[cmd] = f
 
 	return &f.value
