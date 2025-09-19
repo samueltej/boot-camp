@@ -8,7 +8,7 @@ func TestSingleSentence(t *testing.T) {
 	result := wordCounter("This is a test", "")
 	want := 4
 	if result != want {
-		t.Errorf("Error in TestSingleSentence: expected %d, got %d", want, result)
+		t.Errorf("Error en TestSingleSentence: esperado %d, obtenido %d", want, result)
 	}
 }
 
@@ -16,7 +16,7 @@ func TestMultipleSentences(t *testing.T) {
 	result := wordCounter("Go is fun. Testing is important.", "")
 	want := 6
 	if result != want {
-		t.Errorf("Error in TestMultipleSentences: expected %d, got %d", want, result)
+		t.Errorf("Error en TestMultipleSentences: esperado %d, obtenido %d", want, result)
 	}
 }
 
@@ -24,7 +24,7 @@ func TestSingleWord(t *testing.T) {
 	result := wordCounter("Hello", "")
 	want := 1
 	if result != want {
-		t.Errorf("Error in TestSingleWord: expected %d, got %d", want, result)
+		t.Errorf("Error en TestSingleWord: esperado %d, obtenido %d", want, result)
 	}
 }
 
@@ -32,23 +32,23 @@ func TestComposedWord(t *testing.T) {
 	result := wordCounter("read-only", "")
 	want := 2
 	if result != want {
-		t.Errorf("Error in TestComposedWord: expected %d, got %d", want, result)
+		t.Errorf("Error en TestComposedWord: esperado %d, obtenido %d", want, result)
 	}
 }
 
 func TestBreakWords(t *testing.T) {
-	result := wordCounter("\n\n", "")
-	want := 0
+	result := wordCounter("\n\n frase", "")
+	want := 1
 	if result != want {
-		t.Errorf("Error in TestBreakWords: expected %d, got %d", want, result)
+		t.Errorf("Error en TestBreakWords: esperado %d, obtenido %d", want, result)
 	}
 }
 
 func TestWordExit(t *testing.T) {
-	result := wordCounter("EXIT", "") // validated in main
+	result := wordCounter("EXIT", "") //en main se valida
 	want := 1
 	if result != want {
-		t.Errorf("Error in TestWordExit: expected %d, got %d", want, result)
+		t.Errorf("Error en TestWordExit: esperado %d, obtenido %d", want, result)
 	}
 }
 
@@ -63,18 +63,10 @@ func TestSingleLine(t *testing.T) {
 }
 
 func TestMultipleLines(t *testing.T) {
-	lines := []string{
-		"First line",
-		"Second line",
-		"Third line",
-	}
+	text := "First line\nSecond line\nThird line"
 
 	want := 3
-	got := 0
-
-	for _, line := range lines {
-		got += wordCounter(line, "-l")
-	}
+	got := wordCounter(text, "-l")
 
 	if got != want {
 		t.Errorf("Error in TestMultipleLines: expected %d, got %d", want, got)
@@ -82,18 +74,10 @@ func TestMultipleLines(t *testing.T) {
 }
 
 func TestBreakLines(t *testing.T) {
-	lines := []string{
-		"Line1",
-		"", // validated in main
-		"Line2",
-	}
+	text := "Line1\n\nLine2"
 
 	want := 3
-	got := 0
-
-	for _, line := range lines {
-		got += wordCounter(line, "-l")
-	}
+	got := wordCounter(text, "-l")
 
 	if got != want {
 		t.Errorf("Error in TestBreakLines: expected %d, got %d", want, got)
@@ -101,18 +85,10 @@ func TestBreakLines(t *testing.T) {
 }
 
 func TestExitLines(t *testing.T) {
-	lines := []string{
-		"Hello",
-		"EXIT", // validated in main
-		"Goodbye",
-	}
+	text := "Hello\nEXIT\nBye"
 
-	want := 3
-	got := 0
-
-	for _, line := range lines {
-		got += wordCounter(line, "-l")
-	}
+	want := 3 // EXIT es validado en main
+	got := wordCounter(text, "-l")
 
 	if got != want {
 		t.Errorf("Error in TestExitLines: expected %d, got %d", want, got)
