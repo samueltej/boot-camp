@@ -9,45 +9,77 @@ import (
 )
 
 func main() {
+	countLines, countBytes := parseFlags()
+	reader := bufio.NewReader(os.Stdin)
+
+	printModeMessage(countLines, countBytes)
+
+	input := readInput(reader)
+
+	result := modeCounter(input, countLines, countBytes)
+	printResult(result, countLines, countBytes)
+}
+
+
+func parseFlags() (bool, bool) {
 	countLines := flag.Bool("l", false, "count lines")
 	countBytes := flag.Bool("b", false, "count lines")
 	flag.Parse()
+	return *countLines, *countBytes 
+}
 
-	reader := bufio.NewReader(os.Stdin)
 
-	if *countLines {
+func printModeMessage(countLines, countBytes bool) {
+	if countLines {
 		fmt.Println("Line count mode. Write your text (one or several lines). Type 'exit' to finish:")
-	} else if *countBytes {
+	} else if countBytes {
 		fmt.Println("Byte count mode. Write your text (one or several lines). Type 'exit' to finish:")
 	} else {
 		fmt.Println("Word count mode. Write your text (one or several lines). Type 'exit' to finish:")
 	}
+}
 
+
+func readInput(reader *bufio.Reader) string {
 	var inputBuilder strings.Builder
 
 	for {
 		text, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println("Error while reading:", err)
-			return
+			return ""
 		}
-		if strings.TrimSpace(text) == "exit" || strings.TrimSpace(text) == "EXIT" || strings.TrimSpace(text) == "Exit" {
+		if isExit(text) {
 			break
 		}
 		inputBuilder.WriteString(text)
 	}
 
-	input := inputBuilder.String()
-	result := modeCounter(input, *countLines, *countBytes)
+	return inputBuilder.String()
+}
 
-	if *countLines {
+
+func isExit(text string) bool {
+	exitOptions := []string{"exit", "EXIT", "Exit"}
+	for _, option := range exitOptions {
+		if strings.TrimSpace(text) == option {
+			return true
+		}
+	}
+	return false
+}
+
+
+func printResult(result int, countLines, countBytes bool) {
+	if countLines {
 		fmt.Println("Number of Lines:", result)
-	} else if *countBytes {
+	} else if countBytes {
 		fmt.Println("Number of Bytes", result)
 	} else {
 		fmt.Println("Number of words:", result)
 	}
 }
+
 
 func modeCounter(text string, countLines, countBytes bool) int {
 	if countLines {
