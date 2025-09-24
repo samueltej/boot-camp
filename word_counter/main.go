@@ -20,14 +20,12 @@ func main() {
 	printResult(result, countLines, countBytes)
 }
 
-
 func parseFlags() (bool, bool) {
 	countLines := flag.Bool("l", false, "count lines")
-	countBytes := flag.Bool("b", false, "count lines")
+	countBytes := flag.Bool("b", false, "count bytes")
 	flag.Parse()
-	return *countLines, *countBytes 
+	return *countLines, *countBytes
 }
-
 
 func printModeMessage(countLines, countBytes bool) {
 	if countLines {
@@ -38,7 +36,6 @@ func printModeMessage(countLines, countBytes bool) {
 		fmt.Println("Word count mode. Write your text (one or several lines). Type 'exit' to finish:")
 	}
 }
-
 
 func readInput(reader *bufio.Reader) string {
 	var inputBuilder strings.Builder
@@ -58,7 +55,6 @@ func readInput(reader *bufio.Reader) string {
 	return inputBuilder.String()
 }
 
-
 func isExit(text string) bool {
 	exitOptions := []string{"exit", "EXIT", "Exit"}
 	for _, option := range exitOptions {
@@ -68,7 +64,6 @@ func isExit(text string) bool {
 	}
 	return false
 }
-
 
 func printResult(result int, countLines, countBytes bool) {
 	if countLines {
@@ -80,15 +75,17 @@ func printResult(result int, countLines, countBytes bool) {
 	}
 }
 
-
 func modeCounter(text string, countLines, countBytes bool) int {
 	if countLines {
 		lines := strings.Split(text, "\n")
+		if strings.HasSuffix(text, "\n") {
+			return len(lines) - 1
+		}
 		return len(lines)
 	} else if countBytes {
 		noNewLines := strings.ReplaceAll(text, "\r", "")
 		noNewLines = strings.ReplaceAll(noNewLines, "\n", "")
-		return len(noNewLines)
+		return len([]byte(noNewLines))
 	} else {
 		cleanWord := strings.ReplaceAll(text, "-", " ")
 		words := strings.Fields(cleanWord)
