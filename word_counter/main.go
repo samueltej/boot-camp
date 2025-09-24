@@ -85,7 +85,7 @@ func modeCounter(text string, countLines, countBytes bool) int {
 	} else if countBytes {
 		noNewLines := strings.ReplaceAll(text, "\r", "")
 		noNewLines = strings.ReplaceAll(noNewLines, "\n", "")
-		return len([]byte(noNewLines))
+		return len(noNewLines)
 	} else {
 		cleanWord := strings.ReplaceAll(text, "-", " ")
 		words := strings.Fields(cleanWord)
