@@ -56,13 +56,8 @@ func readInput(reader *bufio.Reader) string {
 }
 
 func isExit(text string) bool {
-	exitOptions := []string{"exit", "EXIT", "Exit"}
-	for _, option := range exitOptions {
-		if strings.TrimSpace(text) == option {
-			return true
-		}
-	}
-	return false
+	clean := strings.ToLower(strings.TrimSpace(text))
+	return clean == "exit"
 }
 
 func printResult(result int, countLines, countBytes bool) {

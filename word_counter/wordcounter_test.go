@@ -15,7 +15,7 @@ func TestWordCounter(t *testing.T) {
 		{"TestSingleWord", "hello", 1},
 		{"TestComposedWord", "read-only", 2},
 		{"TestBreakWords", "\n\n word", 1},
-		{"TestWordExit", "Exit", 1}, //
+		{"TestWordExit", "Exit", 1},
 	}
 
 	for _, c := range cases {
@@ -35,7 +35,7 @@ func TestLineCounter(t *testing.T) {
 		{"TestSingleLine", "This is one line", 1},
 		{"TestMultipleLines", "First line\nSecond line\nThird line", 3},
 		{"TestBreakLines", "Line1\n\nLine2", 3},
-		{"TestExitLines", "Hello\nEXIT\nBye", 3},
+		{"TestExitLines", "World\nText\nExit", 3},
 	}
 
 	for _, c := range cases {
