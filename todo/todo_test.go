@@ -10,11 +10,11 @@ func TestAdd(t *testing.T) {
 	ls.AddTask("Buy milk")
 
 	if len(ls) != 1 {
-		t.Errorf("expected list length 1, got %d", len(ls))
+		t.Errorf("TestAdd failed: expected list length 1, got %d", len(ls))
 	}
 
 	if ls[0].Task != "Buy milk" {
-		t.Errorf("expected task %q, got %q", "Buy milk", ls[0].Task)
+		t.Errorf("TestAdd failed: expected task %q, got %q", "Buy milk", ls[0].Task)
 	}
 }
 
@@ -24,11 +24,11 @@ func TestComplete(t *testing.T) {
 
 	err := ls.CompleteTask(0)
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("TestComplete failed: unexpected error: %v", err)
 	}
 
 	if !ls[0].Done {
-		t.Errorf("expected task %q to be completed", ls[0].Task)
+		t.Errorf("TestComplete failed: expected task %q to be completed", ls[0].Task)
 	}
 }
 
@@ -39,15 +39,15 @@ func TestDelete(t *testing.T) {
 
 	err := ls.DeleteTask(0)
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("TestDelete failed: unexpected error: %v", err)
 	}
 
 	if len(ls) != 1 {
-		t.Errorf("expected list length 1, got %d", len(ls))
+		t.Errorf("TestDelete failed: expected list length 1, got %d", len(ls))
 	}
 
 	if ls[0].Task != "Take out the trash" {
-		t.Errorf("expected remaining task to be %q, got %q", "Take out the trash", ls[0].Task)
+		t.Errorf("TestDelete failed: expected remaining task to be %q, got %q", "Take out the trash", ls[0].Task)
 	}
 }
 
@@ -57,24 +57,24 @@ func TestSaveAndGet(t *testing.T) {
 
 	tf, err := os.CreateTemp("", "todo_test_*.json")
 	if err != nil {
-		t.Fatalf("could not create temp file: %v", err)
+		t.Fatalf("TestSaveAndGet failed: could not create temp file: %v", err)
 	}
 	defer os.Remove(tf.Name())
 
 	if err := ls.Save(tf.Name()); err != nil {
-		t.Fatalf("could not save list: %v", err)
+		t.Fatalf("TestSaveAndGet failed: could not save list: %v", err)
 	}
 
 	var newList List
 	if err := newList.Get(tf.Name()); err != nil {
-		t.Fatalf("could not get list: %v", err)
+		t.Fatalf("TestSaveAndGet failed: could not get list: %v", err)
 	}
 
 	if len(newList) != 1 {
-		t.Errorf("expected list length 1, got %d", len(newList))
+		t.Errorf("TestSaveAndGet failed: expected list length 1, got %d", len(newList))
 	}
 
 	if newList[0].Task != "Pay bills" {
-		t.Errorf("expected task %q, got %q", "Pay bills", newList[0].Task)
+		t.Errorf("TestSaveAndGet failed: expected task %q, got %q", "Pay bills", newList[0].Task)
 	}
 }

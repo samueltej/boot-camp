@@ -21,7 +21,6 @@ func main() {
 	args := os.Args[1:]
 
 	if len(args) == 0 {
-		// Listar tareas
 		for _, item := range list {
 			fmt.Println(item.Task)
 		}
