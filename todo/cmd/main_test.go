@@ -12,7 +12,7 @@ import (
 
 var (
 	binName  = "todo"
-	fileName = ".todo.json"
+	fileName = ".test_todo.json"
 )
 
 func TestMain(m *testing.M) {
@@ -70,8 +70,9 @@ func TestTodoCLI(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !strings.Contains(string(out), "Title: "+task) {
-			t.Errorf("expected output to contain 'Title: %s', got %s instead", task, string(out))
+		expected := "[ ] 0: " + task
+		if !strings.Contains(string(out), expected) {
+			t.Errorf("expected output to contain '%s', got %s instead", expected, string(out))
 		}
 	})
 
@@ -81,6 +82,15 @@ func TestTodoCLI(t *testing.T) {
 		err := cmd.Run()
 		if err != nil {
 			t.Fatal(err)
+		}
+		cmd = exec.Command(cmdPath, "-list")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err)
+		}
+		expected := "[X] 0: " + task
+		if !strings.Contains(string(out), expected) {
+			t.Errorf("expected output to contain completed task '%s', got %s instead", expected, string(out))
 		}
 	})
 

@@ -2,6 +2,7 @@ package todo
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -76,5 +77,23 @@ func TestSaveAndGet(t *testing.T) {
 
 	if newList[0].Task != "Pay bills" {
 		t.Errorf("TestSaveAndGet failed: expected task %q, got %q", "Pay bills", newList[0].Task)
+	}
+}
+
+func TestString(t *testing.T) {
+	var ls List
+	ls.AddTask("Task 1")
+	ls.AddTask("Task 2")
+
+	ls.CompleteTask(1)
+
+	result := ls.String()
+
+	if !strings.Contains(result, "[ ] 0: Task 1") {
+		t.Errorf("TestString failed: expected incomplete task format '[ ] 0: Task 1', got:\n%s", result)
+	}
+
+	if !strings.Contains(result, "[X] 1: Task 2") {
+		t.Errorf("TestString failed: expected complete task format '[X] 1: Task 2', got:\n%s", result)
 	}
 }

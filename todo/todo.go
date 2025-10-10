@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -24,6 +25,7 @@ func (ls *List) AddTask(task string) {
 	}
 	*ls = append(*ls, i)
 }
+
 func (ls *List) CompleteTask(index int) error {
 	if index < 0 || index >= len(*ls) {
 		return fmt.Errorf("invalid index %d", index)
@@ -57,18 +59,36 @@ func (ls *List) Save(filename string) error {
 }
 
 func (ls *List) Get(filename string) error {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return err
-	}
-	if len(data) == 0 {
-		return nil
-	}
+    data, err := os.ReadFile(filename)
+    if err != nil {
+        if os.IsNotExist(err) {
+            *ls = List{} 
+            return nil
+        }
+        return err
+    }
+    if len(data) == 0 {
+        *ls = List{} 
+    }
 
-	err = json.Unmarshal(data, ls)
-	if err != nil {
-		return err
-	}
+    err = json.Unmarshal(data, ls)
+    if err != nil {
+        return err
+    }
 
-	return nil
+    return nil
+}
+
+func (ls *List) String() string {
+	var formatted strings.Builder
+	
+	for i, task := range *ls {
+		prefix := "[ ]"
+		if task.Done {
+			prefix = "[X]"
+		}
+		fmt.Fprintf(&formatted, "%s %d: %s\n", prefix, i, task.Task)
+	}
+	
+	return formatted.String()
 }
