@@ -45,10 +45,9 @@ func run(in, out string) error {
 		return fmt.Errorf("failed to read input file: %v", err)
 	}
 
-	body := parseContent(inputData)
+	content := parseContent(inputData)
 
-	content := append([]byte(header), body...)
-	content = append(content, []byte(footer)...)
+	
 
 	var outputName string
 	if out == "" {
@@ -74,7 +73,11 @@ func run(in, out string) error {
 func parseContent(input []byte) []byte {
 	output := blackfriday.Run(input)
 	body := bluemonday.UGCPolicy().SanitizeBytes(output)
-	return body
+
+	htmlContent := append([]byte(header), body...)
+	htmlContent = append(htmlContent, []byte(footer)...)
+
+	return htmlContent
 }
 
 func saveHTML(filename string, data []byte) error {
