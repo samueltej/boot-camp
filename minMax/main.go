@@ -1,60 +1,64 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"strings"
-	"os"
 )
-func main()  {
 
-	
+func main() {
+	min, max, values := getInput()
+	output, err := rangeFilter(min, max, values)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    min, max, values := getInput()
-
-	resultado := minMax(min, max, values)
-	
-	//salida de datos 
-
-	fmt.Println("valor minimo", min, "valor maximo", max, "valores", values)
-	fmt.Println("EL rango es", resultado)
+	// Output
+	fmt.Println("Values in range -->", output)
 }
 
-func getInput()(float64, float64, []float64){
-	//declaracion de variables
+func getInput() (float64, float64, []float64) {
+	// Variable declaration
 	var min, max float64
-	var values [] float64
+	var values []float64
 
-	//entrada de min & max
-	fmt.Println("Escribir los valores (minimo, maximo, lista de valores), separado por espacios")
-	fmt.Scan(&min)
-	fmt.Scan(&max)
+	// Input for min & max
+	fmt.Println("Enter the values (minimum, maximum, list of values), separated by spaces:")
+	fmt.Scan(&min, &max)
 
-	//entrada de values
+	// Input for values
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
-	linea := scanner.Text()
+	line := scanner.Text()
 
-	partes := strings.Fields(linea)
+	parts := strings.Fields(line)
 
-	for _, str := range partes{
+	for _, str := range parts {
 		num, err := strconv.ParseFloat(str, 64)
-		if err == nil {
-			values = append(values, num)	
+		if err != nil {
+			fmt.Println("Conversion error")
+			continue
 		}
+		values = append(values, num)
 	}
-    
 	return min, max, values
 }
 
-func minMax (min float64, max float64, values[] float64) [] float64{
-	var slide[] float64
-	for _, s := range values{
+func rangeFilter(min float64, max float64, values []float64) ([]float64, error) {
+	if min > max {
+		return nil, fmt.Errorf("invalid limits")
+	}
 
-		if s >= min && s < max{
-			slide = append(slide, s)
+	result := []float64{}
+
+	for _, v := range values {
+		if v >= min && v <= max {
+			result = append(result, v)
 		}
-	}	
-	return slide
+	}
+
+	return result, nil
 }
