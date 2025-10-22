@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -29,13 +30,13 @@ func main() {
 	out := flag.String("out", "", "output HTML file name (without extension)")
 	flag.Parse()
 
-	if err := run(*in, *out); err != nil {
+	if err := run(*in, *out, os.Stdout); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func run(in, out string) error {
+func run(in, out string, writer io.Writer) error {
 	if in == "" {
 		return fmt.Errorf("the -in flag is required")
 	}
@@ -47,26 +48,31 @@ func run(in, out string) error {
 
 	content := parseContent(inputData)
 
-	
-
 	var outputName string
-	if out == "" {
-		base := filepath.Base(in)
-		outputName = "md/" + base + ".html"
-	} else {
+	if out != "" {
 		outputName = "md/" + out + ".html"
+	} else {
+		outputName = "md/md*.html"
 	}
 
 	if err := os.MkdirAll(filepath.Dir(outputName), os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create output directory: %v", err)
 	}
 
+	if out == "" {
+		tempFile, err := os.CreateTemp("md", "md*.html")
+		if err != nil {
+			return fmt.Errorf("failed to create temporary file: %v", err)
+		}
+		outputName = tempFile.Name()
+		tempFile.Close()
+	}
 
 	if err := saveHTML(outputName, content); err != nil {
 		return fmt.Errorf("failed to save HTML file: %v", err)
 	}
 
-	fmt.Printf("HTML file successfully created: %s\n", outputName)
+	fmt.Fprintln(writer, outputName)
 	return nil
 }
 
