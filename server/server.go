@@ -1,12 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
 
+func jsonReply(w http.ResponseWriter, r *http.Request, status int, payload *todoResponse) {
+	data, err := json.Marshal(payload)
+	if err != nil {
+		errorReply(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(data)
+}
+
 func textReply(w http.ResponseWriter, r *http.Request, status int, payload string) {
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(status)
 	w.Write([]byte(payload))
 }
@@ -16,8 +29,14 @@ func errorReply(w http.ResponseWriter, r *http.Request, status int, payload stri
 	http.Error(w, payload, status)
 }
 
-func newMux() http.Handler {
+func newMux(dataFile string) http.Handler {
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("/", rootHandler)
+
+	handler := getAllHandler{dataFile: dataFile}
+	mux.Handle("/todo", handler)
+	mux.Handle("/todo/", handler)
+
 	return mux
 }
