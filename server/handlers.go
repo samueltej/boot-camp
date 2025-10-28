@@ -2,12 +2,10 @@ package main
 
 import "net/http"
 
-func rootHandler(w http.ResponseWriter, r *http.Request){
-
+func rootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		errorReply(w, r, http.StatusNotFound, "404 - Page not found")
 		return
 	}
-
-	w.Write([]byte("Hello World!!"))
+	textReply(w, r, http.StatusOK, "Hello World!!")
 }
