@@ -15,66 +15,65 @@ type testCase struct {
 	expectedContent string
 }
 
-func setupAPI(t *testing.T) (url string, cleaner func()) {
+func setupAPI(t *testing.T) (url string, cleanup func()) {
 	t.Helper()
 
-	server := httptest.NewServer(newMux())
-	
+	server := httptest.NewServer(newMux("/todo"))
 	url = server.URL
 
-	cleaner = func() {
-		server.Close()
-	}
+	cleanup = func() { server.Close() }
 
-	return url, cleaner
+	return url, cleanup
 }
 
 func TestGet(t *testing.T) {
 	cases := []testCase{
 		{
-			name:            "Root",
+			name:            "GET Root",
 			path:            "/",
 			expectedCode:    http.StatusOK,
 			expectedContent: "Hello World!!",
 		},
 		{
-			name:            "Not Found",
+			name:            "GET Not Found",
 			path:            "/no-exists",
 			expectedCode:    http.StatusNotFound,
 			expectedContent: "404",
 		},
 	}
 
-	url, cleaner := setupAPI(t)
-	defer cleaner()
+	url, cleanup := setupAPI(t)
+	defer cleanup()
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			res, err := http.Get(url + tc.path)
+			resp, err := http.Get(url + tc.path)
 			if err != nil {
-				t.Fatalf("Error in Get: %v", err)
+				t.Fatalf("GET request failed: %v", err)
 			}
-			defer res.Body.Close()
+			defer resp.Body.Close()
 
-			if res.StatusCode != tc.expectedCode {
-				t.Errorf("expected code %d (%s), but received %d (%s)", 
-					tc.expectedCode, http.StatusText(tc.expectedCode), 
-					res.StatusCode, http.StatusText(res.StatusCode))
+			if resp.StatusCode != tc.expectedCode {
+				t.Errorf(
+					"expected %d (%s), got %d (%s)",
+					tc.expectedCode, http.StatusText(tc.expectedCode),
+					resp.StatusCode, http.StatusText(resp.StatusCode),
+				)
 			}
 
-			bodyBytes, err := io.ReadAll(res.Body)
+			bodyBytes, err := io.ReadAll(resp.Body)
 			if err != nil {
-				t.Fatalf("error reading response body: %v", err)
+				t.Fatalf("reading body failed: %v", err)
 			}
 			body := string(bodyBytes)
 
-			switch res.Header.Get("Content-Type") {
+			switch resp.Header.Get("Content-Type") {
 			case "text/plain; charset=utf-8":
 				if !strings.Contains(body, tc.expectedContent) {
-					t.Errorf("expected content %q, but received %q", tc.expectedContent, body)
+					t.Errorf("expected content %q, got %q", tc.expectedContent, body)
 				}
 			default:
-				t.Fatalf("Unsupported Content-Type: %q", res.Header.Get("Content-Type"))
+				t.Fatalf("unsupported Content-Type: %q", resp.Header.Get("Content-Type"))
 			}
 		})
 	}
