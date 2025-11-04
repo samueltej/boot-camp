@@ -1,24 +1,95 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/samueltej/todo"
 )
 
-type getAllHandler struct {
-	dataFile string
+func router(dataFile string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var list todo.List
+		err := list.Get(dataFile)
+		if err != nil {
+			errorReply(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		path := r.URL.Path
+
+		if strings.HasPrefix(path, "/todo/") && r.Method == http.MethodGet {
+			idStr := strings.TrimPrefix(path, "/todo/")
+			id, err := validateID(idStr, &list)
+			if err != nil {
+				errorReply(w, r, http.StatusBadRequest, err.Error())
+				return
+			}
+			getOneHandler(w, r, &list, id)
+			return
+		}
+
+		if path == "/todo" {
+			switch r.Method {
+			case http.MethodGet:
+				getAllHandler(w, r, &list)
+			case http.MethodPost:
+				addHandler(w, r, &list, dataFile)
+			default:
+				errorReply(w, r, http.StatusMethodNotAllowed, "Method not allowed")
+			}
+			return
+		}
+
+		errorReply(w, r, http.StatusNotFound, "404 page not found")
+	}
 }
 
-func (h getAllHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var list todo.List
-	if err := list.Get(h.dataFile); err != nil {
+func getOneHandler(w http.ResponseWriter, r *http.Request, list *todo.List, id int) {
+	item := (*list)[id]
+	reply := &todoResponse{
+		Results: []todo.Todo{item},
+	}
+	jsonReply(w, r, http.StatusOK, reply)
+}
+
+func validateID(idStr string, list *todo.List) (int, error) {
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id < 0 || id >= len(*list) {
+		return 0, fmt.Errorf("invalid ID: out the range")
+	}
+	return id, nil
+}
+
+func addHandler(w http.ResponseWriter, r *http.Request, list *todo.List, dataFile string) {
+	type NewTask struct {
+		Task string `json:"task"`
+	}
+
+	var item NewTask
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&item)
+	if err != nil {
+		errorReply(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	list.AddTask(item.Task)
+	err = list.Save(dataFile)
+	if err != nil {
 		errorReply(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	resp := todoResponse{Results: list}
-	jsonReply(w, r, http.StatusOK, &resp)
+	textReply(w, r, http.StatusCreated, "Task created successfully")
+}
+
+func getAllHandler(w http.ResponseWriter, r *http.Request, list *todo.List) {
+	reply := &todoResponse{Results: *list}
+	jsonReply(w, r, http.StatusOK, reply)
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +97,5 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		errorReply(w, r, http.StatusNotFound, "404 page not found")
 		return
 	}
-
 	textReply(w, r, http.StatusOK, "Hello World!!")
 }
