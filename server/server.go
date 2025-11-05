@@ -12,7 +12,6 @@ func jsonReply(w http.ResponseWriter, r *http.Request, status int, payload *todo
 		errorReply(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(data)
@@ -31,12 +30,8 @@ func errorReply(w http.ResponseWriter, r *http.Request, status int, payload stri
 
 func newMux(dataFile string) http.Handler {
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("/", rootHandler)
-
-	handler := getAllHandler{dataFile: dataFile}
-	mux.Handle("/todo", handler)
-	mux.Handle("/todo/", handler)
-
+	mux.Handle("/todo", router(dataFile))
+	mux.Handle("/todo/", router(dataFile))
 	return mux
 }

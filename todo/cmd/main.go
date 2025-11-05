@@ -14,8 +14,8 @@ func main() {
 
 	list := flag.Bool("list", false, "List incomplete tasks")
 	task := flag.String("task", "", "Add a new task")
-	complete := flag.Int("complete", -1, "Complete a task")
-	delete := flag.Int("delete", -1, "Delete a task")
+	complete := flag.Int("complete", -1, "Complete a task by its number")
+	delete := flag.Int("delete", -1, "Delete a task by its number")
 	flag.Parse()
 
 	var l todo.List
