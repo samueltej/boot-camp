@@ -13,6 +13,7 @@ import (
 func router(dataFile string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var list todo.List
+
 		err := list.Get(dataFile)
 		if err != nil {
 			errorReply(w, r, http.StatusInternalServerError, err.Error())
@@ -21,14 +22,25 @@ func router(dataFile string) http.HandlerFunc {
 
 		path := r.URL.Path
 
-		if strings.HasPrefix(path, "/todo/") && r.Method == http.MethodGet {
+		if strings.HasPrefix(path, "/todo/") {
 			idStr := strings.TrimPrefix(path, "/todo/")
+
 			id, err := validateID(idStr, &list)
 			if err != nil {
 				errorReply(w, r, http.StatusBadRequest, err.Error())
 				return
 			}
-			getOneHandler(w, r, &list, id)
+
+			switch r.Method {
+			case http.MethodGet:
+				getOneHandler(w, r, &list, id)
+			case http.MethodDelete:
+				deleteHandler(w, r, &list, id, dataFile)
+			case http.MethodPatch:
+				completeHandler(w, r, &list, id, dataFile)
+			default:
+				errorReply(w, r, http.StatusMethodNotAllowed, "Method not allowed")
+			}
 			return
 		}
 
@@ -43,9 +55,36 @@ func router(dataFile string) http.HandlerFunc {
 			}
 			return
 		}
-
-		errorReply(w, r, http.StatusNotFound, "404 page not found")
+		errorReply(w, r, http.StatusNotFound, "Not found")
 	}
+}
+
+func completeHandler(w http.ResponseWriter, r *http.Request, list *todo.List, id int, dataFile string) {
+	(*list)[id].Done = true
+
+	err := list.Save(dataFile)
+	if err != nil {
+		errorReply(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	status := &todoResponse{
+		Results: []todo.Todo{(*list)[id]},
+	}
+	jsonReply(w, r, http.StatusOK, status)
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request, list *todo.List, id int, dataFile string) {
+	*list = append((*list)[:id], (*list)[id+1:]...)
+
+	err := list.Save(dataFile)
+	if err != nil {
+		errorReply(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	reply := &todoResponse{
+		Results: []todo.Todo{},
+	}
+	jsonReply(w, r, http.StatusOK, reply)
 }
 
 func getOneHandler(w http.ResponseWriter, r *http.Request, list *todo.List, id int) {
@@ -70,6 +109,7 @@ func addHandler(w http.ResponseWriter, r *http.Request, list *todo.List, dataFil
 	}
 
 	var item NewTask
+
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&item)
 	if err != nil {
@@ -78,6 +118,7 @@ func addHandler(w http.ResponseWriter, r *http.Request, list *todo.List, dataFil
 	}
 
 	list.AddTask(item.Task)
+
 	err = list.Save(dataFile)
 	if err != nil {
 		errorReply(w, r, http.StatusInternalServerError, err.Error())
@@ -97,5 +138,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		errorReply(w, r, http.StatusNotFound, "404 page not found")
 		return
 	}
+
 	textReply(w, r, http.StatusOK, "Hello World!!")
 }
